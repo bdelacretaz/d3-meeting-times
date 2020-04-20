@@ -37,64 +37,28 @@
   </style>
   <script type="text/javascript">
     window.onload = function() {
-      var testData = [
-        {times: [{"starting_time": 1355752800000, "ending_time": 1355759900000}, {"starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {times: [{"starting_time": 1355759910000, "ending_time": 1355761900000}, ]},
-        {times: [{"starting_time": 1355761910000, "ending_time": 1355763910000}]}
-      ];
-
-      var rectAndCircleTestData = [
-        {times: [{"starting_time": 1355752800000,
-                 "display": "circle"}, {"starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {times: [{"starting_time": 1355759910000,
-        "display":"circle"}, ]},
-        {times: [{"starting_time": 1355761910000, "ending_time": 1355763910000}]}
-      ];
-
-      var labelTestData = [
-        {label: "person a", times: [{"starting_time": 1355752800000, "ending_time": 1355759900000}, {"starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {label: "person b", times: [{"starting_time": 1355759910000, "ending_time": 1355761900000}, ]},
-        {label: "person c", times: [{"starting_time": 1355761910000, "ending_time": 1355763910000}]}
-      ];
-
-      var iconTestData = [
-        {class:"jackie", icon: "jackie.png", times: [
-          {"starting_time": 1355752800000, "ending_time": 1355759900000}, 
-          {"starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {class:"troll", icon: "troll.png", times: [
-          {"starting_time": 1355759910000, "ending_time": 1355761900000,
-          "display":"circle"}, ]},
-        {class:"wat", icon: "wat.png", times: [
-          {"starting_time": 1355761910000, "ending_time": 1355763910000}]}
-      ];
-
-      var labelColorTestData = [
-        {label: "person a", times: [{"color":"green", "label":"Weeee", "starting_time": 1355752800000, "ending_time": 1355759900000}, {"color":"blue", "label":"Weeee", "starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {label: "person b", times: [{"color":"pink", "label":"Weeee", "starting_time": 1355759910000, "ending_time": 1355761900000}, ]},
-        {label: "person c", times: [{"color":"yellow", "label":"Weeee", "starting_time": 1355761910000, "ending_time": 1355763910000}]}
-      ];
-
-      var testDataWithColor = [
-        {label: "fruit 1", fruit: "orange", times: [
-          {"starting_time": 1355759910000, "ending_time": 1355761900000}]},
-        {label: "fruit 2", fruit: "apple", times: [
-          {"starting_time": 1355752800000, "ending_time": 1355759900000},
-          {"starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {label: "fruit3", fruit: "lemon", times: [
-          {"starting_time": 1355761910000, "ending_time": 1355763910000}]}
-        ];
-
-      var testDataWithColorPerTime = [
-        {label: "fruit 2", fruit: "apple", times: [
-          {fruit: "orange", "starting_time": 1355752800000, "ending_time": 1355759900000},
-          {"starting_time": 1355767900000, "ending_time": 1355774400000},
-          {fruit: "lemon", "starting_time": 1355774400000, "ending_time": 1355775500000}]}
-        ];
-
-      var testDataRelative = [
-        {times: [{"starting_time": 1355752800000, "ending_time": 1355759900000}, {"starting_time": 1355767900000, "ending_time": 1355774400000}]},
-        {times: [{"starting_time": 1355759910000, "ending_time": 1355761900000}]},
-        {times: [{"starting_time": 1355761910000, "ending_time": 1355763910000}]}
+      var meetingData = 
+      [
+        {
+          label: "Ringo", 
+          times: [
+            {"color":"green", "label":"A-green", "starting_time": 1355752800000, "ending_time": 1355759900000}, 
+            {"color":"blue", "label":"A-blue", "starting_time": 1355767900000, "ending_time": 1355774400000}
+          ]
+        },
+        {
+          label: "John", 
+          times: [
+            {"color":"pink", "label":"B-pink", "starting_time": 1355759910000, "ending_time": 1355761900000}, 
+          ]
+        },
+        {
+          label: "Paul", 
+          times: [
+            {"color":"yellow", "label":"C-yellow", "starting_time": 1355761910000, "ending_time": 1355763910000},
+            {"color":"#CCC", "label":"C-grey", "starting_time": 1355767900000, "ending_time": 1355774400000}
+          ]
+        }
       ];
 
       var width = 500;
@@ -106,9 +70,18 @@
           .ending(1355774400000)
           .stack() // toggles graph stacking
           .margin({left:70, right:30, top:0, bottom:0})
+          .tickFormat({
+            format: d3.time.format("%H:%M - %A"),
+            tickTime: d3.time.minutes,
+            tickInterval: 30,
+            tickSize: 5
+          })
           ;
-        var svg = d3.select("#meetingTimes").append("svg").attr("width", width)
-          .datum(labelColorTestData).call(chart);
+        var svg = d3
+          .select("#meetingTimes")
+          .append("svg")
+          .attr("width", width)
+          .datum(meetingData).call(chart);
       }
 
       timelineMeetingTimes();
@@ -119,6 +92,7 @@
   <div>
     <h3>Possible Meeting Times</h3>
     <div id="meetingTimes"></div>
+    <p>Powered by the <a href="https://github.com/jiahuang/d3-timeline">jiahuang/d3-timeline</a> d3.js plugin.</p>
   </div>
 
 
