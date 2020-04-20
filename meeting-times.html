@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="d3-timeline.js"></script>
@@ -14,14 +15,14 @@
       shape-rendering: crispEdges;
     }
 
-    .axis text {
+    .axis text, body {
       font-family: sans-serif;
-      font-size: 10px;
+      font-size: 15px;
     }
 
     .timeline-label {
       font-family: sans-serif;
-      font-size: 12px;
+      font-size: 15px;
     }
 
     #timeline2 .axis {
@@ -35,10 +36,25 @@
     .coloredDiv {
       height:20px; width:20px; float:left;
     }
+
+    #selectedUTCStart, #selectedPersonStart {
+      color:blue;
+    }
+
+    #selectedPerson {
+      font-weight:bold;
+    }
+
+    .footer {
+      border-top: solid #CCC 1px;
+      font-style: italic;
+      text-align: right;
+    }
   </style>
   <script type="text/javascript">
-    function hoursToMsec(hours) {
-      return hours * 3600 * 1000;
+    function utcTime(startTime, person, localTimeHours) {
+      var localOffsetMsec = (localTimeHours - person.offset) * 3600 * 1000;
+      return new Date(startTime.getTime() + localOffsetMsec);
     }
 
     function processInput(input) {
@@ -53,8 +69,9 @@
           times.push({
             "color": t.color,
             "label": t.label,
-            "starting_time": new Date(input.startTime.getTime() + hoursToMsec(t.start)),
-            "ending_time": new Date(input.startTime.getTime() + hoursToMsec(t.end)),
+            "starting_time": utcTime(input.startTime, p, t.start),
+            "ending_time": utcTime(input.startTime, p, t.end),
+            "person": p,
           }); 
         }
 
@@ -64,23 +81,45 @@
       return result;
     }
 
+    function personLocalTime(person, date) {
+      // TODO I haven't found a nicer way to format 
+      // a timezone using a specific offset in hours
+      var dateWithOffset = new Date(date.getTime() + (person.offset * 3600 * 1000));
+      var offset = "UTC" + (person.offset == 0 ? "" : ((person.offset > 0 ? "+" : "") + person.offset));
+      var output = 
+        dateWithOffset.toLocaleString("en-us", {timeZone: 'UTC'})
+        + " (" + offset + ")"
+      ;
+      return output;
+    }
+
     window.onload = function() {
       var meetingData = processInput(possibleMeetingTimes);
+      var timePaddingMsec = possibleMeetingTimes.timePaddingHours * 3600 * 1000;
 
       function timelineMeetingTimes() {
         var chart = d3.timeline()
           .rotateTicks(45)
-          .beginning(possibleMeetingTimes.startTime)
-          .ending(possibleMeetingTimes.endTime)
           .stack()
-          .margin({left:70, right:30, top:0, bottom:0})
+          .margin({left:150, right:30, top:0, bottom:0})
           .tickFormat({
             format: d3.time.format("%H:%M - %A"),
             tickTime: d3.time.minutes,
-            tickInterval: 30,
+            tickInterval: 60,
             tickSize: 5
           })
           .showTimeAxisTick()
+          .mouseover(function (d, i, datum) {
+            // d is the current rendering object
+            // i is the index during d3 rendering
+            // datum is the data object
+            $("#selectedPerson").text(d.person.name);
+            $("#selectedUTCStart").text(d.starting_time.toLocaleString('en-US', {timeZone: 'UTC', timeZoneName: 'short'}));
+            $("#selectedPersonStart").text(personLocalTime(d.person, d.starting_time));
+            $("#selectedTime").animate({"opacity": "0.2" }, "fast", "swing", function() {
+              $("#selectedTime").animate({"opacity": "1" }, "fast");
+            });
+          })
           ;
         var svg = d3
           .select("#meetingTimes")
@@ -90,14 +129,36 @@
       }
 
       timelineMeetingTimes();
+
+      $("#startDate").text(possibleMeetingTimes.startTime);
+      $("#localOffset").text(new Date().getTimezoneOffset() / 60);
     }
   </script>
 </head>
 <body>
   <div>
     <h3>Possible Meeting Times</h3>
+
+    <p>
+      Reference date: 
+      <b><span id="startDate">NOT_SET</span></b>
+    </p>
+    <p>
+      X axis times are displayed using your browser's timezone with <b><span id="localOffset">NOT_SET</span> hours offset</b> from UTC.
+    </p>
+
+    <h4>Selected segment start time</h4>
+    <div id="selectedTime">
+      <p>
+        UTC: <span id="selectedUTCStart">Click the diagram and move your mouse cursor on a colored box to show its time here</span></span>
+        -
+        Local time for <span id="selectedPerson"></span>: <span id="selectedPersonStart"></span>
+      </p>
+    </div>
+
     <div id="meetingTimes"></div>
-    <p>Powered by the <a href="https://github.com/jiahuang/d3-timeline">jiahuang/d3-timeline</a> d3.js plugin.</p>
+
+    <div class="footer">Powered by the <a href="https://github.com/jiahuang/d3-timeline">jiahuang/d3-timeline</a> d3.js plugin.</div>
   </div>
 
 
