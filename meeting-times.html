@@ -4,6 +4,7 @@
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="d3-timeline.js"></script>
+  <script src="meeting-times.js"></script>
 
   <style type="text/css">
     .axis path,
@@ -36,39 +37,42 @@
     }
   </style>
   <script type="text/javascript">
-    window.onload = function() {
-      var meetingData = 
-      [
-        {
-          label: "Ringo", 
-          times: [
-            {"color":"green", "label":"A-green", "starting_time": 1355752800000, "ending_time": 1355759900000}, 
-            {"color":"blue", "label":"A-blue", "starting_time": 1355767900000, "ending_time": 1355774400000}
-          ]
-        },
-        {
-          label: "John", 
-          times: [
-            {"color":"pink", "label":"B-pink", "starting_time": 1355759910000, "ending_time": 1355761900000}, 
-          ]
-        },
-        {
-          label: "Paul", 
-          times: [
-            {"color":"yellow", "label":"C-yellow", "starting_time": 1355761910000, "ending_time": 1355763910000},
-            {"color":"#CCC", "label":"C-grey", "starting_time": 1355767900000, "ending_time": 1355774400000}
-          ]
-        }
-      ];
+    function hoursToMsec(hours) {
+      return hours * 3600 * 1000;
+    }
 
-      var width = 500;
+    function processInput(input) {
+      var result = [];
+
+      for(i in input.people) {
+        var p = input.people[i];
+
+        var times = [];
+        for(j in p.times) {
+          var t = p.times[j];
+          times.push({
+            "color": t.color,
+            "label": t.label,
+            "starting_time": new Date(input.startTime.getTime() + hoursToMsec(t.start)),
+            "ending_time": new Date(input.startTime.getTime() + hoursToMsec(t.end)),
+          }); 
+        }
+
+        result.push({ label: p.name, times: times});
+      }
+
+      return result;
+    }
+
+    window.onload = function() {
+      var meetingData = processInput(possibleMeetingTimes);
 
       function timelineMeetingTimes() {
         var chart = d3.timeline()
           .rotateTicks(45)
-          .beginning(1355752800000) // we can optionally add beginning and ending times to speed up rendering a little
-          .ending(1355774400000)
-          .stack() // toggles graph stacking
+          .beginning(possibleMeetingTimes.startTime)
+          .ending(possibleMeetingTimes.endTime)
+          .stack()
           .margin({left:70, right:30, top:0, bottom:0})
           .tickFormat({
             format: d3.time.format("%H:%M - %A"),
@@ -76,11 +80,12 @@
             tickInterval: 30,
             tickSize: 5
           })
+          .showTimeAxisTick()
           ;
         var svg = d3
           .select("#meetingTimes")
           .append("svg")
-          .attr("width", width)
+          .attr("width", possibleMeetingTimes.widthPixels)
           .datum(meetingData).call(chart);
       }
 
