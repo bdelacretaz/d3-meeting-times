@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="d3-timeline.js"></script>
   <script src="meeting-times.js"></script>
 
@@ -37,12 +37,8 @@
       height:20px; width:20px; float:left;
     }
 
-    #selectedUTCStart, #selectedPersonStart {
-      color:blue;
-    }
-
-    #selectedPerson {
-      font-weight:bold;
+    #selectedUTCStart, #selectedPersonStart , #selectedPerson {
+      color:black;
     }
 
     #tooltip {
@@ -51,7 +47,9 @@
       border: solid #DDD 1px;
       border-radius: 5px;
       background-color: white;
-      padding: 0.5em;
+      color:grey;
+      padding: 0.8em;
+      margin: 0;
     }
 
     .footer {
@@ -129,7 +127,8 @@
             var tooltip = d3.select("#tooltip");
             var x = d3.event.pageX;
             var y = d3.event.pageY;
-            tooltip.style("opacity", 1).style("left", x+ "px").style("top", y + "px");
+            tooltip.style("left", x+ "px").style("top", y + "px");
+            tooltip.style("opacity", 1);
           })
           .mouseout(function (d, i, datum) {
             d3.select("#tooltip").style("opacity", 0);
@@ -158,7 +157,7 @@
       Please enter your data in <a href="./meeting-times.js">meeting-times.js</a>.
     <p>    
     <p>
-      Reference date: 
+      Reference date (REF): 
       <b><span id="startDate">NOT_SET</span></b>
     </p>
     <p>
@@ -170,12 +169,9 @@
 
     <!-- hidden by CSS, shown on demand -->
     <div id="tooltip">
-      <p>
-        Start of segment: <span id="selectedUTCStart">Click the diagram and move your mouse cursor on a colored box to show its time here</span></span>
-      </p>   
-      <p>
-        Local time for <span id="selectedPerson"></span>: <span id="selectedPersonStart"></span>
-      </p>
+      Start of segment: <span id="selectedUTCStart">Click the diagram and move your mouse cursor on a colored box to show its time here</span></span>
+      <br/>
+      Which is <span id="selectedPersonStart"></span> for <span id="selectedPerson"></span>.
     </div>
 
     <div id="meetingTimes"></div>
