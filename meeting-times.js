@@ -4,6 +4,7 @@ var DURATION_MSEC = 24 * ONE_HOUR_MSEC;
 var WIDTH_PIXELS = 2000;
 
 var possibleMeetingTimes = {
+    meetingName: "Some Test Meeting",
     startTime: new Date(START_TIME),
     endTime: new Date(START_TIME.getTime() + DURATION_MSEC),
     widthPixels: WIDTH_PIXELS,
